@@ -1,6 +1,4 @@
 
-
-
 import pygame as p
 import logic
 
