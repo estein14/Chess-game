@@ -2,7 +2,7 @@
 import pygame as p
 import logic
 
-WIDTH = HEIGHT = 400
+WIDTH = HEIGHT = 600
 DIMENSION = 8
 SQ_SIZE = HEIGHT // DIMENSION #50
 MAX_FPS = 15 #Animations
@@ -24,18 +24,48 @@ def main():
     gs = logic.Game_State()
     load_images()
     running = True
+
+    piece_chosen = ()
+    turn = []
+
+
     while running:
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
-        print(e)
+            elif e.type == p.MOUSEBUTTONDOWN:
+                cur_location = p.mouse.get_pos()
+                col = cur_location[0] // SQ_SIZE
+                row = cur_location[1] // SQ_SIZE
+                print(piece_chosen)
+
+                # Chosing same piece twice unclicks
+                if piece_chosen == (row, col):
+                    print("Chose twice")
+                    piece_chosen = ()
+                    turn = []
+
+                else:
+                    piece_chosen = (row, col)
+                    turn.append(piece_chosen)
+
+                if len(turn) == 2:
+                    move = gs.Single_Move(turn[0], turn[1], gs.board)
+                    gs.move_piece(move)
+                    piece_chosen = ()
+                    turn = []
+
+        print(gs.move_log)
         drawGameState(screen, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
 
 
+# Drawing all the graphics for gamestate
 def drawGameState(screen, gs):
     drawSquares(screen)
+
+    # Add in highliting or loop suggestions or something
     drawPieces(screen, gs.board)
 
 def drawSquares(screen):
@@ -43,7 +73,7 @@ def drawSquares(screen):
 
     for x in range(DIMENSION):
         for y in range(DIMENSION):
-            color = colors[((x+y) % 2)]
+            color = colors[((x + y) % 2)]
             p.draw.rect(screen, color, p.Rect(y * SQ_SIZE, x * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
 def drawPieces(screen, board):
