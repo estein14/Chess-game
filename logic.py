@@ -20,11 +20,23 @@ class Game_State():
         self.move_log = []
 
 
+    # Moves a single piece
     def move_piece(self, move):
         self.board[move.from_sq_row][move.from_sq_col] = "e"
         self.board[move.to_sq_row][move.to_sq_col] = move.piece_moved
         self.move_log.append(move)
         self.whites_turn = not self.whites_turn
+
+    #Undoes a single piece move
+    def undo_move_piece(self):
+        if len(self.move_log) > 0:
+            last_move = self.move_log.pop()
+            taken_piece = last_move.piece_taken
+            undo_move = self.Single_Move((last_move.to_sq_row, last_move.to_sq_col), (last_move.from_sq_row, last_move.from_sq_col), self.board)
+            self.move_piece(undo_move)
+            self.move_log.pop()
+            self.board[last_move.to_sq_row][last_move.to_sq_col] = taken_piece
+
 
 
     class Single_Move():

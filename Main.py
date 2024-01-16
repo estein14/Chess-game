@@ -37,29 +37,31 @@ def main():
                 cur_location = p.mouse.get_pos()
                 col = cur_location[0] // SQ_SIZE
                 row = cur_location[1] // SQ_SIZE
-                print(piece_chosen)
-
                 # Chosing same piece twice unclicks
                 if piece_chosen == (row, col):
-                    print("Chose twice")
                     piece_chosen = ()
                     turn = []
-
+                # first piece chose
                 else:
                     piece_chosen = (row, col)
                     turn.append(piece_chosen)
-
+                # Second sqaure chosen
                 if len(turn) == 2:
                     move = gs.Single_Move(turn[0], turn[1], gs.board)
                     gs.move_piece(move)
                     piece_chosen = ()
                     turn = []
+                
+            elif e.type == p.KEYDOWN:
+                keys_pressed = p.key.get_pressed()
+                if keys_pressed[p.K_BACKSPACE]:
+                    gs.undo_move_piece()
 
-        print(gs.move_log)
         drawGameState(screen, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
 
+        
 
 # Drawing all the graphics for gamestate
 def drawGameState(screen, gs):
