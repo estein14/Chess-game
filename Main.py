@@ -1,6 +1,7 @@
 
 import pygame as p
 import logic
+import time
 
 WIDTH = HEIGHT = 600
 DIMENSION = 8
@@ -22,14 +23,15 @@ def main():
     clock = p.time.Clock()
     screen.fill(p.Color("white"))
     gs = logic.Game_State()
+    valid_moves = gs.all_valid_moves()
+    move_made = False
     load_images()
     running = True
-
     piece_chosen = ()
     turn = []
 
-
     while running:
+        print(turn)
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
@@ -41,28 +43,44 @@ def main():
                 if piece_chosen == (row, col):
                     piece_chosen = ()
                     turn = []
-                # first piece chose
+                # first piece chosen
                 else:
                     piece_chosen = (row, col)
                     turn.append(piece_chosen)
+
+                    # Highlight red if wrong move
+                    # p.draw.rect(screen, p.Color("Red"), p.Rect(row * SQ_SIZE, col * SQ_SIZE, SQ_SIZE, SQ_SIZE))
+                    # time.sleep(2)
                 # Second sqaure chosen
                 if len(turn) == 2:
                     move = gs.Single_Move(turn[0], turn[1], gs.board)
-                    gs.move_piece(move)
-                    piece_chosen = ()
-                    turn = []
-                
+                    
+                    if move in valid_moves:
+                        gs.move_piece(move)
+                        move_made = True
+                        piece_chosen = ()
+                        turn = []
+                    else:
+                        piece_chosen = ()
+                        turn = []
+                    
+            # Backspace undoes moves
             elif e.type == p.KEYDOWN:
                 keys_pressed = p.key.get_pressed()
                 if keys_pressed[p.K_BACKSPACE]:
                     gs.undo_move_piece()
+                    move_made = True
+                    valid_moves = gs.all_valid_moves()
+
+        if move_made:
+            valid_moves = gs.all_valid_moves()
+            move_made = False
 
         drawGameState(screen, gs)
         clock.tick(MAX_FPS)
         p.display.flip()
 
         
-
 # Drawing all the graphics for gamestate
 def drawGameState(screen, gs):
     drawSquares(screen)
