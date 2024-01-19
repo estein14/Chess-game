@@ -62,29 +62,125 @@ class Game_State:
         return all_moves
 
 
+    # All pawn moves
+    # One square forward, two if first move until blocked, takes diagonally one space
     def get_pawn_moves(self, r, c):
         pawn_moves = []
         # White Paws
-        if self.whites_turn:
+        if self.whites_turn and (r - 1 >= 0):
             if self.board[r - 1][c] == 'e':
                 pawn_moves.append(self.Single_Move((r, c), (r - 1, c), self.board))
+
                 if (r == 6) and self.board[r - 2][c] == 'e':
                     pawn_moves.append(self.Single_Move((r, c), (r - 2, c), self.board))
-        else:
+
+            # Cover taking diagonally
+            if (c - 1 >=  0) and self.board[r - 1][c - 1][0] == 'b':
+                pawn_moves.append(self.Single_Move((r, c), (r - 1, c - 1), self.board))
+
+            if (c + 1 < 8) and self.board[r - 1][c + 1][0] == 'b':
+                pawn_moves.append(self.Single_Move((r, c), (r - 1, c + 1), self.board))
+
+        elif not self.whites_turn and (r + 1 < 8):
             if self.board[r + 1][c] == 'e':
                 pawn_moves.append(self.Single_Move((r, c), (r + 1, c), self.board))
+
                 if (r == 1) and self.board[r + 1][c] == 'e':
                     pawn_moves.append(self.Single_Move((r, c), (r + 2, c), self.board))
 
-        
+            # Cover taking diagonally
+            if (c - 1 >=  0) and self.board[r + 1][c - 1][0] == 'w':
+                pawn_moves.append(self.Single_Move((r, c), (r + 1, c - 1), self.board))
+
+            if (c + 1 < 8) and self.board[r + 1][c + 1][0] == 'w':
+                pawn_moves.append(self.Single_Move((r, c), (r + 1, c + 1), self.board))
+
         return pawn_moves
 
+
+    # All moves that a rook can make
+    # Up, down, left, right - as far as possible until blocked or takes
     def get_rook_moves(self, r, c):
         rook_moves = []
+
+        # Rook moves up
+        up = 1
+        while (up < 8) and (r - up >= 0):
+            if self.board[r - up][c] == 'e':
+                rook_moves.append(self.Single_Move((r, c), (r - up, c), self.board))
+
+            if ((self.whites_turn and self.board[r - up][c][0] == 'b') or 
+                (not self.whites_turn and self.board[r - up][c][0] == 'w')):
+                rook_moves.append(self.Single_Move((r, c), (r - up, c), self.board))
+                break
+
+            if ((self.whites_turn and self.board[r - up][c][0] == 'w') or 
+                (not self.whites_turn and self.board[r - up][c][0] == 'b')):
+                break
+            up += 1
+
+        # Rook moves down
+        down = 1
+        while (down < 8) and (r + down < 8):
+            if self.board[r + down][c] == 'e':
+                rook_moves.append(self.Single_Move((r, c), (r + down, c), self.board))
+
+            if ((self.whites_turn and self.board[r + down][c][0] == 'b') or 
+                (not self.whites_turn and self.board[r + down][c][0] == 'w')):
+                rook_moves.append(self.Single_Move((r, c), (r + down, c), self.board))
+                break
+
+            if ((self.whites_turn and self.board[r + down][c][0] == 'w') or 
+                (not self.whites_turn and self.board[r + down][c][0] == 'b')):
+                break
+            down += 1
+
+        # Rook moves right
+        right = 1
+        while (right < 8) and (c + right < 8):
+            if self.board[r][c + right] == 'e':
+                rook_moves.append(self.Single_Move((r, c), (r, c + right), self.board))
+
+            if ((self.whites_turn and self.board[r][c + right][0] == 'b') or 
+                (not self.whites_turn and self.board[r][c + right][0] == 'w')):
+                rook_moves.append(self.Single_Move((r, c), (r, c + right), self.board))
+                break
+
+            if ((self.whites_turn and self.board[r][c + right][0] == 'w') or 
+                (not self.whites_turn and self.board[r][c + right][0] == 'b')):
+                break
+            right += 1
+
+        # Rook moves left
+        left = 1
+        while (left < 8) and (c - left >= 0):
+            if self.board[r][c - left] == 'e':
+                rook_moves.append(self.Single_Move((r, c), (r, c - left), self.board))
+
+            if ((self.whites_turn and self.board[r][c - left][0] == 'b') or 
+                (not self.whites_turn and self.board[r][c - left][0] == 'w')):
+                rook_moves.append(self.Single_Move((r, c), (r, c - left), self.board))
+                break
+
+            if ((self.whites_turn and self.board[r][c - left][0] == 'w') or 
+                (not self.whites_turn and self.board[r][c - left][0] == 'b')):
+                break
+            left += 1
+
         return rook_moves
 
+
+    # All Knight moves
+    # Moves two squares in one direction then one square perpendicularly
+    # Can take, can jump
     def get_knight_moves(self, r, c):
         knight_moves = []
+
+
+
+
+
+        
         return knight_moves
 
     def get_bishop_moves(self, r, c):

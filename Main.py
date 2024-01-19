@@ -31,11 +31,11 @@ def main():
     turn = []
 
     while running:
-        print(turn)
         for e in p.event.get():
             if e.type == p.QUIT:
                 running = False
             elif e.type == p.MOUSEBUTTONDOWN:
+                print(gs.whites_turn)
                 cur_location = p.mouse.get_pos()
                 col = cur_location[0] // SQ_SIZE
                 row = cur_location[1] // SQ_SIZE
