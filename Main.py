@@ -16,7 +16,6 @@ def load_images():
         IMAGES[piece] = p.transform.scale(p.image.load("pieces/" + piece + ".png"), ((SQ_SIZE - 4), (SQ_SIZE - 4)))
 
 
-
 def main():
     p.init()
     screen = p.display.set_mode((WIDTH, HEIGHT))
@@ -35,7 +34,6 @@ def main():
             if e.type == p.QUIT:
                 running = False
             elif e.type == p.MOUSEBUTTONDOWN:
-                print(gs.whites_turn)
                 cur_location = p.mouse.get_pos()
                 col = cur_location[0] // SQ_SIZE
                 row = cur_location[1] // SQ_SIZE
@@ -72,6 +70,12 @@ def main():
                     move_made = True
                     valid_moves = gs.all_valid_moves()
 
+                elif keys_pressed[p.K_r]:
+                    gs.redo_move_piece()
+                    move_made = True
+                    valid_moves = gs.all_valid_moves()
+
+
         if move_made:
             valid_moves = gs.all_valid_moves()
             move_made = False
@@ -83,25 +87,32 @@ def main():
         
 # Drawing all the graphics for gamestate
 def drawGameState(screen, gs):
-    drawSquares(screen)
+    drawSquares(screen, gs)
 
     # Add in highliting or loop suggestions or something
-    drawPieces(screen, gs.board)
+    drawPieces(screen, gs)
 
-def drawSquares(screen):
+def drawSquares(screen, gs):
     colors = [p.Color("white"), p.Color("gray")]
-
     for x in range(DIMENSION):
         for y in range(DIMENSION):
             color = colors[((x + y) % 2)]
             p.draw.rect(screen, color, p.Rect(y * SQ_SIZE, x * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
-def drawPieces(screen, board):
-    for x in range(DIMENSION):
-        for y in range(DIMENSION):
-            piece = board[x][y]
-            if piece != "e":
-                screen.blit(IMAGES[piece], p.Rect(y * SQ_SIZE, x * SQ_SIZE, SQ_SIZE, SQ_SIZE))
+
+def drawPieces(screen, gs):
+    # if gs.whites_turn:
+        for x in range(DIMENSION):
+            for y in range(DIMENSION):
+                piece = gs.board[x][y]
+                if piece != "e":
+                    screen.blit(IMAGES[piece], p.Rect(y * SQ_SIZE, x * SQ_SIZE, SQ_SIZE, SQ_SIZE))
+    # else:
+    #     for x in range(DIMENSION):
+    #         for y in range(DIMENSION):
+    #             piece = gs.board[x][y]
+    #             if piece != "e":
+    #                 screen.blit(IMAGES[piece], p.Rect((7 - y) * SQ_SIZE, (7 - x) * SQ_SIZE, SQ_SIZE, SQ_SIZE))
 
     
 if __name__ == "__main__":

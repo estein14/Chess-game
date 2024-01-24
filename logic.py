@@ -17,6 +17,7 @@ class Game_State:
         ]
 
         self.whites_turn = True
+        self.undo_log = []
         self.move_log = []
 
 
@@ -36,7 +37,14 @@ class Game_State:
             self.move_piece(undo_move)
             self.move_log.pop()
             self.board[last_move.to_sq_row][last_move.to_sq_col] = taken_piece
+            self.undo_log.append(undo_move)
 
+    def redo_move_piece(self):
+        if len(self.undo_log) > 0:
+            print("here")
+            redo_move = self.undo_log.pop()
+            self.move_piece(redo_move)
+            self.whites_turn = not self.whites_turn
 
     # Returns a list of every possible valid move
     def all_valid_moves(self):
@@ -61,6 +69,12 @@ class Game_State:
 
         return all_moves
 
+
+    def display_black_turn(self):
+        black_board = self.board[::-1]
+        for col in black_board:
+            col = col[::-1]
+        return black_board
 
     # All pawn moves
     # One square forward, two if first move until blocked, takes diagonally one space
@@ -176,23 +190,187 @@ class Game_State:
     def get_knight_moves(self, r, c):
         knight_moves = []
 
+        if (r - 2 >= 0) and (c - 1 >= 0):
+            if ((self.board[r - 2][c - 1] == 'e') or
+                (self.whites_turn and self.board[r - 2][c - 1][0] == 'b') or 
+                (not self.whites_turn and self.board[r - 2][c - 1][0] == 'w')):
+                knight_moves.append(self.Single_Move((r, c), (r - 2, c - 1), self.board))
 
+        if (r - 1 >= 0) and (c - 2 >= 0):
+            if ((self.board[r - 1][c - 2] == 'e') or
+                (self.whites_turn and self.board[r - 1][c - 2][0] == 'b') or 
+                (not self.whites_turn and self.board[r - 1][c - 2][0] == 'w')):
+                knight_moves.append(self.Single_Move((r, c), (r - 1, c - 2), self.board))
 
+        if (r - 2 >= 0) and (c + 1 < 8):
+            if ((self.board[r - 2][c + 1] == 'e') or
+                (self.whites_turn and self.board[r - 2][c + 1][0] == 'b') or 
+                (not self.whites_turn and self.board[r - 2][c + 1][0] == 'w')):
+                knight_moves.append(self.Single_Move((r, c), (r - 2, c + 1), self.board))
 
+        if (r - 1 >= 0) and (c + 2 < 8):
+            if ((self.board[r - 1][c + 2] == 'e') or
+                (self.whites_turn and self.board[r - 1][c + 2][0] == 'b') or 
+                (not self.whites_turn and self.board[r - 1][c + 2][0] == 'w')):
+                knight_moves.append(self.Single_Move((r, c), (r - 1, c + 2), self.board))
 
-        
+        if (r + 2 < 8) and (c - 1 >= 0):
+            if ((self.board[r + 2][c - 1] == 'e') or
+                (self.whites_turn and self.board[r + 2][c - 1][0] == 'b') or 
+                (not self.whites_turn and self.board[r + 2][c - 1][0] == 'w')):
+                knight_moves.append(self.Single_Move((r, c), (r + 2, c - 1), self.board))
+
+        if (r + 1 < 8) and (c - 2 >= 0):
+            if ((self.board[r + 1][c - 2] == 'e') or
+                (self.whites_turn and self.board[r + 1][c - 2][0] == 'b') or 
+                (not self.whites_turn and self.board[r + 1][c - 2][0] == 'w')):
+                knight_moves.append(self.Single_Move((r, c), (r + 1, c - 2), self.board))
+
+        if (r + 2 < 8) and (c + 1 < 8):
+            if ((self.board[r + 2][c + 1] == 'e') or
+                (self.whites_turn and self.board[r + 2][c + 1][0] == 'b') or 
+                (not self.whites_turn and self.board[r + 2][c + 1][0] == 'w')):
+                knight_moves.append(self.Single_Move((r, c), (r + 2, c + 1), self.board))
+
+        if (r + 1 < 8) and (c + 2 < 8):
+            if ((self.board[r + 1][c + 2] == 'e') or
+                (self.whites_turn and self.board[r + 1][c + 2][0] == 'b') or 
+                (not self.whites_turn and self.board[r + 1][c + 2][0] == 'w')):
+                knight_moves.append(self.Single_Move((r, c), (r + 1, c + 2), self.board))
+    
         return knight_moves
+
 
     def get_bishop_moves(self, r, c):
         bishop_moves = []
+
+        up_left = 1
+        while (up_left < 8) and (r - up_left >= 0) and (c - up_left >= 0):
+            if self.board[r - up_left][c - up_left] == 'e':
+                bishop_moves.append(self.Single_Move((r, c), (r - up_left, c - up_left), self.board))
+
+
+            if ((self.whites_turn and self.board[r - up_left][c - up_left][0] == 'b') or 
+                (not self.whites_turn and self.board[r - up_left][c - up_left][0] == 'w')):
+                bishop_moves.append(self.Single_Move((r, c), (r - up_left, c - up_left), self.board))
+                break
+
+            if ((self.whites_turn and self.board[r - up_left][c - up_left][0] == 'w') or 
+                (not self.whites_turn and self.board[r - up_left][c - up_left][0] == 'b')):
+                break
+            up_left +=1 
+
+        up_right = 1
+        while (up_right < 8) and (r - up_right >= 0) and (c + up_right < 8):
+            if self.board[r - up_right][c + up_right] == 'e':
+                bishop_moves.append(self.Single_Move((r, c), (r - up_right, c + up_right), self.board))
+
+
+            if ((self.whites_turn and self.board[r - up_right][c + up_right][0] == 'b') or 
+                (not self.whites_turn and self.board[r - up_right][c + up_right][0] == 'w')):
+                bishop_moves.append(self.Single_Move((r, c), (r - up_right, c + up_right), self.board))
+                break
+
+            if ((self.whites_turn and self.board[r - up_right][c + up_right][0] == 'w') or 
+                (not self.whites_turn and self.board[r - up_right][c + up_right][0] == 'b')):
+                break
+            up_right += 1
+
+        down_left = 1
+        while (down_left < 8) and (r + down_left < 8) and (c - down_left >= 0):
+            if self.board[r + down_left][c - down_left] == 'e':
+                bishop_moves.append(self.Single_Move((r, c), (r + down_left, c - down_left), self.board))
+
+
+            if ((self.whites_turn and self.board[r + down_left][c - down_left][0] == 'b') or 
+                (not self.whites_turn and self.board[r + down_left][c - down_left][0] == 'w')):
+                bishop_moves.append(self.Single_Move((r, c), (r + down_left, c - down_left), self.board))
+                break
+
+            if ((self.whites_turn and self.board[r + down_left][c - down_left][0] == 'w') or 
+                (not self.whites_turn and self.board[r + down_left][c - down_left][0] == 'b')):
+                break
+            down_left +=1 
+
+
+        down_right = 1
+        while (down_right < 8) and (r + down_right < 8) and (c + down_right < 8):
+            if self.board[r + down_right][c + down_right] == 'e':
+                bishop_moves.append(self.Single_Move((r, c), (r + down_right, c + down_right), self.board))
+
+
+            if ((self.whites_turn and self.board[r + down_right][c + down_right][0] == 'b') or 
+                (not self.whites_turn and self.board[r + down_right][c + down_right][0] == 'w')):
+                bishop_moves.append(self.Single_Move((r, c), (r + down_right, c + down_right), self.board))
+                break
+
+            if ((self.whites_turn and self.board[r + down_right][c + down_right][0] == 'w') or 
+                (not self.whites_turn and self.board[r + down_right][c + down_right][0] == 'b')):
+                break
+            down_right +=1 
+
+
         return bishop_moves
 
     def get_queen_moves(self, r, c):
         queen_moves = []
+        queen_moves.extend(self.get_bishop_moves(r=r, c=c))
+        queen_moves.extend(self.get_rook_moves(r=r, c=c))
         return queen_moves
 
     def get_king_moves(self, r, c):
         king_moves = []
+
+        if (r - 1 >= 0):
+            if ((self.board[r - 1][c][0] == 'e') or 
+                    (self.whites_turn and self.board[r - 1][c][0] == 'b') or 
+                    (not self.whites_turn and self.board[r - 1][c][0] == 'w')):
+                    king_moves.append(self.Single_Move((r, c), (r - 1, c), self.board))
+
+            if (c - 1 >= 0):
+                if ((self.board[r - 1][c - 1][0] == 'e') or 
+                    (self.whites_turn and self.board[r - 1][c - 1][0] == 'b') or 
+                    (not self.whites_turn and self.board[r - 1][c - 1][0] == 'w')):
+                    king_moves.append(self.Single_Move((r, c), (r - 1, c - 1), self.board))
+
+
+            if (c + 1 < 8):
+                if ((self.board[r - 1][c + 1][0] == 'e') or 
+                    (self.whites_turn and self.board[r - 1][c + 1][0] == 'b') or 
+                    (not self.whites_turn and self.board[r - 1][c + 1][0] == 'w')):
+                    king_moves.append(self.Single_Move((r, c), (r - 1, c + 1), self.board))
+
+        
+        if (r + 1 < 8):
+            if ((self.board[r + 1][c][0] == 'e') or 
+                (self.whites_turn and self.board[r + 1][c][0] == 'b') or 
+                (not self.whites_turn and self.board[r + 1][c][0] == 'w')):
+                king_moves.append(self.Single_Move((r, c), (r + 1, c), self.board))
+
+            if (c - 1 >= 0):
+                if ((self.board[r + 1][c - 1][0] == 'e') or 
+                    (self.whites_turn and self.board[r + 1][c - 1][0] == 'b') or 
+                    (not self.whites_turn and self.board[r + 1][c - 1][0] == 'w')):
+                    king_moves.append(self.Single_Move((r, c), (r + 1, c - 1), self.board))
+
+            if (c + 1 < 8):
+                if ((self.board[r + 1][c + 1][0] == 'e') or 
+                    (self.whites_turn and self.board[r + 1][c + 1][0] == 'b') or 
+                    (not self.whites_turn and self.board[r + 1][c + 1][0] == 'w')):
+                    king_moves.append(self.Single_Move((r, c), (r + 1, c + 1), self.board))
+
+        if (c + 1 < 8):
+            if ((self.board[r][c + 1][0] == 'e') or 
+                (self.whites_turn and self.board[r][c + 1][0] == 'b') or 
+                (not self.whites_turn and self.board[r][c + 1][0] == 'w')):
+                king_moves.append(self.Single_Move((r, c), (r, c + 1), self.board))
+
+        if (c - 1 >= 0):
+            if ((self.board[r][c - 1][0] == 'e') or 
+                (self.whites_turn and self.board[r][c - 1][0] == 'b') or 
+                (not self.whites_turn and self.board[r][c - 1][0] == 'w')):
+                king_moves.append(self.Single_Move((r, c), (r, c - 1), self.board))
+
         return king_moves
 
 
